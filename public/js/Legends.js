@@ -39,5 +39,3 @@ class Legends {
     }
 
 }
-
-export default Legends;

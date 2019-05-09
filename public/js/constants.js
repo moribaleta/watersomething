@@ -5,7 +5,3 @@ const WATER_QUALITY_LEGEND = [
     { color: '#81ff00', name: '80% - 94%' },
     { color: '#0bff4d', name: '95% - 100%' }
 ];
-
-export {
-    WATER_QUALITY_LEGEND
-};

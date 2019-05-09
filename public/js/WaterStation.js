@@ -142,5 +142,3 @@ class WaterStation {
         return '#FF0000';
     }
 }
-
-export default WaterStation;

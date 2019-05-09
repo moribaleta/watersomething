@@ -442,5 +442,3 @@ function getCoordinatesPerStation() {
         }
     }
 }
-
-export default getCoordinatesPerStation;
