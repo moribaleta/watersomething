@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Users</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <script src="js/jquery-3.0.0.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <link href="css/main-style.css" rel="stylesheet">
+    <script src="js/vue.js"></script>
+    <script src="js/datahandler.js"></script>
+
+</head>
+
+<body>
+    <!-- <nav class="navbar navbar-inverse navbar-fixed-top" id="header">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="index.html">BFP admin (Users)</a>
+            </div>
+        </div>
+    </nav> -->
+    <div class="sidenav">
+        <div class="sidenav-item">
+            <img class="nav-image" src="resources/images/logo.png" />
+        </div>
+        <div class="sidenav-item ">
+            <a href="reports.html">
+                <div class="icon-block">
+                    <i class="material-icons">assessment</i>
+                    <h5 class="center">Reports</h5>
+                </div>
+            </a>
+        </div>
+        <div class="sidenav-item active">
+            <a href="users.html">
+                <div class="icon-block">
+                    <i class="material-icons">group</i>
+                    <h5 class="center">Users</h5>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="container" id="content">
+        <div id="myModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add New User</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col col-md-12">
+                                <p>username</p>
+                                <input type="text" class="input input-time" v-model="data_input.name">
+                            </div>
+
+                            <div class="col col-md-12">
+                                <p>type</p>
+                                <select id="input-district" class="input input-select" v-model="data_input.type">
+                                    <option :selected="'Admin'==data_input.type">Admin</option>
+                                    <option :selected="'District'==data_input.type">District</option>
+                                </select>
+                            </div>
+                            <div class="col col-md-12">
+                                <p>password</p>
+                                <input type="password" class="input input-time" v-model="data_input.password">
+                                <p>confirm password</p>
+                                <input type="password" class="input input-time" v-model="conf_password">
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal"
+                            v-on:click="addUser()">Save</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"
+                            v-on:click="close()">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <h1>Users</h1>
+        <div class="section" v-if="user_list.length > 0">
+
+            <div class="well" v-for="item,index in user_list">
+                <div class="row">
+
+                    <div class="col col-md-3">name: {{item.name}}</div>
+                    <div class="col col-md-3">type: {{item.type}}</div>
+                    <div class="col col-md-4">date created: {{item.time}}</div>
+
+                    <div class="col col-md-1">
+                        <a class="list-item-action" v-on:click="editItem(index)">
+                            <i class="material-icons">create</i>
+                        </a>
+                        <a class="list-item-action" v-on:click="deleteItem(index)">
+                            <i class="material-icons">delete</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <!-- <table class="table" id="myTable">
+                <thead>
+                    <tr>
+                        <th scope="col" v-for="item in headers">
+                            {{item}}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="item" v-for="item,index in user_list">
+                        <td scope="col" v-for="key in headers">
+                            {{item[key]}}
+                        </td>
+                        <td scope="col">
+                            <a class="list-item-action" v-on:click="editItem(index)">edit</a>
+                            <a class="list-item-action" v-on:click="deleteItem(index)">delete</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table> -->
+    </div>
+    <div class="fixed-action-btn">
+        <button type="button" class="btn btn-default btn-success" id="add-report" data-toggle="modal"
+            data-target="#myModal">Add
+            New User</button>
+    </div>
+    </div>
+
+    <script>
+        var app = new Vue({
+            el: '#content',
+            data: {
+                user_list: [],
+                headers: [],
+                data_input: {
+                    name: null,
+                    password: null,
+                    type: null
+                },
+                editUserId: null,
+                isEdit: false,
+                conf_password: null
+            },
+            methods: {
+                initApp() {
+                    getUsers(this.setUser)
+                },
+                setUser(data) {
+                    this.user_list = JSON.parse(data)
+                    if (this.user_list.length > 0) {
+                        this.headers = Object.keys(this.user_list[0])
+                    }
+                },
+                addUser() {
+                    if (this.data_input.password == this.conf_password) {
+                        if (this.isEdit) {
+                            editUserDetail(this.editUserId, this.data_input, this.initApp)
+                        } else {
+                            addUser(this.data_input, this.initApp)
+                        }
+                        this.close()
+                    } else {
+                        alert("password doesn't match")
+                    }
+                },
+                editItem(index) {
+                    this.isEdit = true
+
+                    var user = this.user_list[index]
+                    this.editUserId = user.id
+                    this.data_input.name = user.name
+                    this.data_input.type = user.type
+                    document.getElementById('add-report').click()
+                },
+                deleteItem(index) {
+                    deleteUser(this.user_list[index].id, this.initApp)
+                },
+                close() {
+                    this.data_input = {
+                        name: null,
+                        password: null,
+                        type: null
+                    }
+                    this.conf_password = null
+                    this.isEdit = false
+                }
+
+            }
+        })
+
+        var header = new Vue({
+            el: '#header',
+            methods: {
+                onStart() {
+                    let user = sessionStorage.getItem('user')
+                    console.log(user)
+                    if (user) {
+                        console.log('success')
+                        app.initApp()
+                    } else {
+                        alert('login user account')
+                        this.onLogout()
+                    }
+                },
+                onLogout() {
+                    sessionStorage.removeItem('user')
+                    window.open('login.html', '_self')
+                }
+            }
+        })
+
+        header.onStart()
+    </script>
+
+</body>
+
+</html>

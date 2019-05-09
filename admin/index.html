@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Reports</title>
+
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href='open-iconic-master/font/css/open-iconic-bootstrap.css' rel="stylesheet">
+    <script src="js/jquery-3.0.0.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <link href="css/main-style.css" rel="stylesheet">
+    <script src="js/vue.js"></script>
+    <script src="js/datahandler.js"></script>
+
+    <style>
+        .input {
+            width: 100%;
+        }
+
+        .loader_container {
+            width: 100%;
+            height: 100%;
+            min-height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader {
+            border: 16px solid #f3f3f3;
+            /* Light grey */
+            border-top: 16px solid #3498db;
+            /* Blue */
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div class="sidenav">
+        <div class="sidenav-item">
+            <img class="nav-image" src="resources/images/logo.png" />
+        </div>
+        <div class="sidenav-item active">
+            <a href="#reports-panel">
+                <div class="icon-block">
+                    <i class="material-icons">assessment</i>
+                    <h5 class="center">Reports</h5>
+                </div>
+            </a>
+        </div>
+        <div class="sidenav-item">
+            <a href="users.html">
+                <div class="icon-block">
+                    <i class="material-icons">group</i>
+                    <h5 class="center">Users</h5>
+                </div>
+            </a>
+        </div>
+    </div>
+    <div class="container" id="content">
+        <div id="AddReportModal" class="modal fade" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add New Report</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container" style="padding-top: 0">
+                            <p>date and time</p><input type="datetime-local" class="input input-time"
+                                v-model="data_input.date">
+                            <br><br>
+                            <p>alarm level</p>
+                            <select id="input-alarm" class="input input-select" v-model="data_input.alarm">
+                                <option v-for="(item,index) in map_report.alarm"
+                                    :selected="index == data_input.alarm ? true : false">{{item}}</option>
+                            </select>
+                            <br><br>
+                            <p>cause</p>
+                            <select id="input-cause" class="input input-select" v-model="data_input.cause">
+                                <option v-for="(item,index) in map_report.cause"
+                                    :selected="index == data_input.cause ? true : false">{{item}}</option>
+                            </select>
+                            <br><br>
+                            <p>establishment type</p>
+                            <select id="input-establishment" class="input input-select" v-model="data_input.type">
+                                <option v-for="(item,index) in map_report.type"
+                                    :selected="index == data_input.type ? true : false">{{item}}</option>
+                            </select>
+                            <br><br>
+                            <p>complete address</p>
+                            <input type="text" class="input input-temp" v-model="data_input.complete_address">
+                            <br><br>
+
+                            <div class="input-item col-md-12">
+                                <button class="btn btn-default" v-on:click="fetchLatLong()">search location lat
+                                    long</button>
+                            </div>
+
+                            <div class="input-item col-md-6">
+                                <p>longitude</p>
+                                <input type="number" class="input input-temp" v-model="data_input.longitude">
+                            </div>
+
+                            <div class="input-item col-md-6">
+                                <p>latitude</p>
+                                <input type="number" class="input input-temp" v-model="data_input.latitude">
+                            </div>
+
+                            <div class="input-item col-md-6">
+                                <p>amount of damage</p>
+                                <input type="number" class="input input-temp" v-model="data_input.amount_damage">
+                            </div>
+
+                            <div class="input-item col-md-6">
+                                <p>fatality</p>
+                                <input type="number" class="input input-temp" v-model="data_input.fatality">
+                            </div>
+
+                            <div class="input-item col-md-6">
+                                <p>injured</p>
+                                <input type="number" class="input input-temp" v-model="data_input.injured">
+                            </div>
+
+                            <div class="input-item col-md-6">
+                                <p>district</p>
+                                <select id="input-district" class="input input-select" v-model="data_input.district">
+                                    <option v-for="(item,index) in districts"
+                                        :selected="index == data_input.district ? true : false">{{item}}</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" v-on:click="filupload()">Upload Document
+                            Report</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal"
+                            v-on:click="saveReport()">Add</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <h1>Reports</h1>
+        <div class="loader_container" v-if="isDataLoading">
+            <div class="loader"></div>
+        </div>
+
+
+        <div class="section" v-if="!isDataLoading">
+            <div class="input-container" style="padding-bottom: 50px; margin-bottom: 50px; align-items: center">
+                <div class="col col-md-2">
+                    <p class="input-label">year</p>
+                    <select id="input-type" class="input input-select" v-model="filter.year">
+                        <option v-for="(item,index) in map_report.year" :selected="index == filter.year ? true : false">{{item
+                                    ? item : "NOT AVAILABLE"}}</option>
+                    </select>
+                </div>
+                <div class="col col-md-2">
+                    <p class="input-label">month</p>
+                    <select id="input-type" class="input input-select" v-model="filter.month">
+                        <option v-for="(item,index) in months" :selected="index == filter.month ? true : false">
+                            {{item}}</option>
+                    </select>
+                </div>
+
+
+                <div class="col col-md-2">
+                    <p class="input-label">weekday</p>
+                    <select id="input-type" class="input input-select" v-model="filter.day">
+                        <option v-for="(item,index) in map_report.day" :selected="index == filter.day ? true : false">{{item
+                                    ? item : "NOT AVAILABLE"}}</option>
+                    </select>
+                </div>
+
+                <div class="col col-md-2">
+                    <p class="input-label">district</p>
+                    <select id="input-district" class="input input-select" v-model="filter.district">
+                        <option v-for="(item,index) in map_report.district"
+                            :selected="index == filter.district ? true : false">
+                            {{item}}</option>
+                    </select>
+                </div>
+
+                <div class="col col-md-3">
+                    <button type="button" id="add-report" class="btn btn-warning button-view"
+                        v-on:click="filterList()">filter
+                    </button>
+                </div>
+
+            </div>
+            <table class="table" id="myTable">
+                <thead>
+                    <tr>
+                        <th scope="col" v-for="item,index in header">
+                            {{item}}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="item" v-for="item,index in reports_view">
+                        <td scope="col" v-for="key in header">
+                            {{item[key]}}
+                        </td>
+                        <td scope="col">
+                            <a class="list-item-action" v-on:click="deleteItem(index)">delete</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="fixed-action-btn" v-if="!isDataLoading">
+            <button type="button" id="add-report" class="btn btn-success button-view" data-toggle="modal"
+                data-target="#AddReportModal">add
+                report
+            </button>
+            <button type="button" id="add-report" class="btn btn-success button-view" v-on:click="openGenerateReport()">
+                generate
+                report
+            </button>
+        </div>
+    </div>
+
+    <!--  Scripts-->
+    <script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+
+    <script>
+        var user = null
+        var app
+
+        var header = new Vue({
+            el: '#header',
+            methods: {
+                onStart() {
+                    user = JSON.parse(sessionStorage.getItem('user'))
+                    console.log(user)
+                    if (user) {
+                        console.log('success')
+                        getReports(true, onHandleData)
+                        app.setLoading(true)
+                    } else {
+                        alert('login user account')
+                        this.onLogout()
+                    }
+                },
+                onLogout() {
+                    sessionStorage.removeItem('user')
+                    window.open('login.html', '_self')
+                }
+            }
+        })
+
+
+
+        app = new Vue({
+            el: '#content',
+            data: {
+                reports: [],
+                reports_view: [],
+                data_input: {
+                    date: "",
+                    cause: 0,
+                    alarm: 0,
+                    type: 0,
+                    amount_damage: 0,
+                    longitude: 0,
+                    latitude: 0,
+                    district: 0,
+                    complete_address: null,
+                    fatality: 0,
+                    injured: 0
+                },
+
+                map_report: {},
+                districts: [
+                    'Sampaloc',
+                    'Tondo',
+                    'Ermita',
+                    'Paco',
+                    'Port Area',
+                    'Pandacan',
+                    'Santa Ana',
+                    'Santa Cruz',
+                    'Quiapo',
+                    'San Miguel',
+                    'Binondo',
+                    'San Andres',
+                    'Malate',
+                    'Intramuros',
+                    'San Nicolas',
+                    'Santa Mesa',
+                    'NOT AVAILABLE',
+                ],
+
+                selections: {
+                    year: [],
+                    months: [
+                        'all',
+                        'JANUARY',
+                        'FEBRUARY',
+                        'MARCH',
+                        'APRIL',
+                        'MAY',
+                        'JUNE',
+                        'JULY',
+                        'AUGUST',
+                        'SEPTEMBER',
+                        'OCTOBER',
+                        'NOVEMBER',
+                        'DECEMBER',
+                        'NOT AVAILABLE',
+                    ],
+                    day: [],
+                },
+
+                months: [
+                    'all',
+                    'JANUARY',
+                    'FEBRUARY',
+                    'MARCH',
+                    'APRIL',
+                    'MAY',
+                    'JUNE',
+                    'JULY',
+                    'AUGUST',
+                    'SEPTEMBER',
+                    'OCTOBER',
+                    'NOVEMBER',
+                    'DECEMBER',
+                    'NOT AVAILABLE',
+                ],
+
+                filter: {
+                    year: null,
+                    month: null,
+                    day: null,
+                    district: null
+                },
+
+                isDataLoading: false,
+
+                header: []
+            },
+            methods: {
+                setData: function (data, map_report) {
+                    console.log("data %o", data)
+                    if (data.length > 0) {
+                        this.header = Object.keys(data[0])
+                        this.reports = data
+                        this.reports_view = this.reports
+                    }
+                    this.map_report = map_report
+                    this.setLoading(false)
+                },
+
+                setLoading(isLoading) {
+                    this.isDataLoading = isLoading
+                },
+
+                filterList: function () {
+                    //year
+                    this.reports_view = this.reports.filter((item) => {
+                        if (!this.filter.year || this.filter.year == 'all' || this.filter.year ==
+                            item.YEAR) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    })
+                    //month
+                    this.reports_view = this.reports_view.filter((item) => {
+                        if (!this.filter.month || this.filter.month == 'all' || this.filter.month ==
+                            item.MONTH) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    })
+                    //day
+                    this.reports_view = this.reports_view.filter((item) => {
+                        if (!this.filter.day || this.filter.day == 'all' || this.filter.day == item
+                            .DAY) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    })
+
+                    //district
+                    this.reports_view = this.reports_view.filter((item) => {
+                        if (!this.filter.district || this.filter.district == 'all' || this.filter
+                            .district == item.DISTRICT) {
+                            return true
+                        } else {
+                            return false
+                        }
+                    })
+                },
+
+                getIndex: function (key, value) {
+                    var val_return = null
+                    var count = 0;
+                    var items = this.map_report[key];
+                    for (var i = 0; i < items.length; i++) {
+                        console.log(items[i] + " == " + value)
+                        if (items[i].toLowerCase() == value.toLowerCase()) {
+                            return i
+                        }
+                    }
+                },
+                getValue(key, index) {
+                    return this.map_report[key][index]
+                },
+                saveReport() {
+                    console.log(this.data_input)
+                    var date = this.data_input.date.split("T")[0]
+                    var time = this.data_input.date.split("T")[1]
+                    time = tConv24(time)
+                    console.log(time)
+
+                    let months = [
+                        'JANUARY',
+                        'FEBRUARY',
+                        'MARCH',
+                        'APRIL',
+                        'MAY',
+                        'JUNE',
+                        'JULY',
+                        'AUGUST',
+                        'SEPTEMBER',
+                        'OCTOBER',
+                        'NOVEMBER',
+                        'DECEMBER',
+                    ];
+
+
+                    let months_short = [
+                        'Jan',
+                        'Feb',
+                        'Mar',
+                        'Apr',
+                        'May',
+                        'Jun',
+                        'Jul',
+                        'Aug',
+                        'Sep',
+                        'Oct',
+                        'Nov',
+                        'Dec',
+                    ];
+
+                    let weekday = [
+                        'Sunday',
+                        'Monday',
+                        'Tuesday',
+                        'Wednesday',
+                        'Thursday',
+                        'Friday',
+                        'Saturday',
+                    ]
+
+                    /*  var date = date.split("-")
+
+                     var year = date[0]
+                     var month = months[Number(date[1])]
+                     var day = date[2] */
+
+                    date = new Date(this.data_input.date)
+
+                    let year = date.getFullYear()
+                    let month = months[date.getMonth()]
+                    let weekdate = weekday[date.getDay()]
+                    let day = date.getDate()
+                    let shortYear = ("" + year).slice(-2)
+                    let short_date = day + "-" + months_short[date.getMonth()] + "-" + shortYear
+
+
+                    console.log(this.data_input)
+
+                    let report = {
+                        ALERT_LEVEL: this.data_input.alarm,
+                        AMOUNT_OF_DAMAGE: this.data_input.amount_damage,
+                        CAUSE: this.data_input.cause,
+                        COMPLETE_ADDRESS: this.data_input.complete_address,
+                        DATE: short_date,
+                        DAY: weekdate,
+                        DISTRICT: this.data_input.district,
+                        ESTABLISHMENT: this.data_input.type,
+                        LATITUDE: this.data_input.latitude == 0 ? null : this.data_input.latitude,
+                        LONGITUDE: this.data_input.longitude == 0 ? null : this.data_input.longitude,
+                        MONTH: month,
+                        TIME: time.toUpperCase(),
+                        YEAR: year,
+                        FATALITY: this.data_input.fatality,
+                        INJURED: this.data_input.injured
+                    }
+
+                    console.log('report %o', report)
+
+                    saveReport(report, user.id, header.onStart)
+                },
+                deleteItem: function (index) {
+                    let id = this.reports[index].ID
+                    deleteReports(id, this.successDeleteItem)
+                },
+                successDeleteItem() {
+                    document.location.reload()
+                },
+                filupload() {
+                    window.open('reports_upload.html', '_self')
+                },
+                openGenerateReport() {
+                    window.open('reports_generate.html', '_self')
+                },
+                sort(header) {
+                    console.log('sort bitch')
+                    w3.sortHTML('#myTable', '.item', 'td:nth-child(' + (header + 1) + ')')
+                },
+
+                fetchLatLong() {
+                    let api =
+                        `https://maps.googleapis.com/maps/api/geocode/json?address=${this.data_input.complete_address}&key=AIzaSyBymq4YRMhZoMwnPUd2SfyzQQLEvUtafkM`
+                    $.get(api).then((data) => {
+                        console.log(data)
+                        if (data.error_message == undefined) {
+                            let location = data.results[0].geometry.location
+                            this.data_input.latitude = location.lat
+                            this.data_input.longitude = location.lng
+                        } else {
+                            /* throw (data.error_message) */
+                            alert(data.error_message)
+                        }
+                    }).catch(error => {
+                        console.log("error fetch %o", error)
+                        alert(error)
+                    })
+                },
+
+            }
+        })
+
+        function tConv24(time24) {
+            var ts = time24;
+            var H = +ts.substr(0, 2);
+            var h = (H % 12) || 12;
+            //h = (h < 10) ? ("0" + h) : h; // leading 0 at the left for 1 digit hours
+            var ampm = H < 12 ? "AM" : "PM";
+            //ts = h + ts.substr(2, 3) + ampm;
+            return Number(h) + ampm;
+        };
+
+
+        header.onStart()
+
+        var map_report = {
+            date: [],
+            cause: [],
+            alarm: [],
+            temp: [],
+            type: [],
+            district: ['all'],
+            year: ['all'],
+            day: ['all']
+        }
+
+        function generateMap(key, data) {
+            if (map_report[key].includes(data)) {
+                return
+            } else {
+                map_report[key].push(data)
+            }
+        }
+
+        function onHandleData(data) {
+
+            new Promise((resolve, reject) => {
+                console.log(data)
+
+                data.map(element => {
+                    generateMap("date", element.DATE)
+                    generateMap("cause", element.CAUSE)
+                    generateMap("alarm", element.ALERT_LEVEL)
+                    generateMap("year", element.YEAR)
+                    generateMap("day", element.DAY)
+                    //generateMap("temp", element.temperature)
+                    generateMap("type", element.ESTABLISHMENT)
+                    generateMap("district", element.DISTRICT)
+                })
+
+                var filter_data = data.filter((item) => {
+                    return (user.type == 'Admin' || item.USERID == user.id)
+                })
+
+                if (filter_data.length > 0) {
+                    filter_data = filter_data.map((item) => {
+                        delete item['COMPLETE_ADDRESS']
+                        delete item['FATALITY']
+                        delete item['INJURED']
+                        return item
+                    })
+                }
+
+                console.log(map_report)
+                resolve(filter_data)
+            }).then((filter_data) => {
+                console.log(filter_data)
+                app.setData(filter_data, map_report)
+            })
+
+        }
+    </script>
+
+</body>
+
+</html>
