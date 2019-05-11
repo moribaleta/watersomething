@@ -35,21 +35,19 @@
       box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.2), 0 5px 5px 0 rgba(0, 0, 0, 0.24);
     }
 
-    .header-container{
+    .header-container {
       display: flex;
       /* height: 200px; */
       flex-direction: column;
       align-items: center;
     }
 
-    .header-image{
+    .header-image {
       height: 150px;
       width: auto;
     }
 
-    .header-title{
-
-    }
+    .header-title {}
 
 
     .form input {
@@ -75,7 +73,7 @@
       padding: 15px;
       color: #FFFFFF;
       font-size: 14px;
-      
+
       cursor: pointer;
       border-radius: 8px;
       transition: all .3s ease-in-out
@@ -154,14 +152,14 @@
 <body>
   <div class="login-page" id='content'>
     <div class="form">
-      
+
       <div class="header-container">
-          <img class="header-image" src="resources/images/logo.png">
-          <h1 class="header-title">Water Reserve</h1>  
+        <img class="header-image" src="resources/images/logo.png">
+        <h1 class="header-title">Water Reserve</h1>
       </div>
       <div class="login-form">
-        <input type="text" placeholder="username" v-model="data_input.username" />
-        <input type="password" placeholder="password" v-model="data_input.password" />
+        <input type="text" placeholder="username" v-model="username" />
+        <input type="password" placeholder="password" v-model="password" />
         <button v-on:click="login">login</button>
       </div>
     </div>
@@ -170,10 +168,8 @@
     var app = new Vue({
       el: '#content',
       data: {
-        data_input: {
-          username: null,
-          password: null
-        }
+        username: null,
+        password: null
       },
       methods: {
         onStart() {
@@ -185,14 +181,23 @@
           }
         },
         login() {
-          loginUser(this.data_input, this.proceed)
-          console.log("login")
+          console.log("login in")
+          DataHandler.login(this.username, this.password).then((data) => {
+            console.log(data)
+            if (data.error) {
+              throw data.error
+            } else {
+              this.proceed(data)
+            }
+          }).catch(error => {
+            console.log(error)
+            alert('Invalid Username and Password')
+          })
         },
         proceed(data) {
           console.log(data)
           if (data != "error") {
-            sessionStorage.setItem('user', data)
-            /* window.location('index.html') */
+            sessionStorage.setItem('user', JSON.stringify(data))
             window.open('index.html', "_self")
           } else {
             alert("error")
@@ -202,14 +207,6 @@
     })
 
     app.onStart()
-  </script>
-  <script>
-    $('.message a').click(function () {
-      $('form').animate({
-        height: "toggle",
-        opacity: "toggle"
-      }, "slow");
-    });
   </script>
 </body>
 

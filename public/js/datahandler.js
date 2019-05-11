@@ -1,4 +1,4 @@
-const domain = "http://192.168.254.102/"
+const domain = "http://192.168.254.100/"
 const baseurl = domain + 'watersomething/api/'
 
 class Datahandler {

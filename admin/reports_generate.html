@@ -5,13 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
-    <link href="css/main-style.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href='open-iconic-master/font/css/open-iconic-bootstrap.css' rel="stylesheet">
     <script src="js/jquery-3.0.0.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
+    <link href="css/main-style.css" rel="stylesheet">
     <script src="js/vue.js"></script>
     <script src="js/datahandler.js"></script>
-    <script src="js/classifier.js"></script>
-    <script src="js/regression.js"></script>
+
     <style>
         .input {
             width: 150px;
@@ -47,20 +49,42 @@
             width: 100%;
         }
 
-        .button-container{  
+        .button-container {
             padding-top: 100px;
         }
     </style>
 </head>
 
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top" id="header">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="index.html">BFP admin (Reports/Generate Reports)</a>
-            </div>
+    <div class="sidenav" id="header">
+        <div class="sidenav-item">
+            <img class="nav-image" src="resources/images/logo.png" />
         </div>
-    </nav>
+        <div class="sidenav-item active">
+            <a href="#reports-panel">
+                <div class="icon-block">
+                    <i class="material-icons">assessment</i>
+                    <h5 class="center">Reports</h5>
+                </div>
+            </a>
+        </div>
+        <div class="sidenav-item" v-if="user && user.type == 'ADMIN'">
+            <a href="users.html">
+                <div class="icon-block">
+                    <i class="material-icons">group</i>
+                    <h5 class="center">Users</h5>
+                </div>
+            </a>
+        </div>
+        <div class="sidenav-item">
+            <a v-on:click="onLogout()">
+                <div class="icon-block">
+                    <i class="material-icons">close</i>
+                    <h5 class="center">Log Out</h5>
+                </div>
+            </a>
+        </div>
+    </div>
     <div id='content' style="padding-top: 50px">
         <div class="container">
             <div class="section">
@@ -70,10 +94,6 @@
 
                 <div id="demo" class="collapse">
                     <div class="filter-div row">
-                        <!--  <div>
-                                    <input type="radio" id="huey" name="drone" value="huey" checked>
-                                    <label for="huey">Huey</label>
-                                </div>-->
                         <div class="filter_item col-md-3" v-for="filter_type,index of filter_types">
                             <input type="radio" class="radio" :value="filter_type"
                                 v-on:click="update_filter_list(filter_type)" :checked="getChecked(filter_type)">
@@ -85,33 +105,24 @@
                     <div class="col col-md-3">
                         <p class="input-label">year</p>
                         <select id="input-type" class="input input-select" v-model="data_input.year">
-                            <option v-for="(item,index) in map_report.year"
-                                :selected="index == data_input.year ? true : false">{{item
+                            <option v-for="(item,index) in selections.years"
+                                :selected="item == data_input.year ? true : false">{{item
                                 ? item : "NOT AVAILABLE"}}</option>
                         </select>
                     </div>
                     <div class="col col-md-3">
                         <p class="input-label">month</p>
                         <select id="input-type" class="input input-select" v-model="data_input.month">
-                            <option v-for="(item,index) in months" :selected="index == data_input.month ? true : false">
+                            <option v-for="(item,index) in selections.months"
+                                :selected="index == data_input.month ? true : false">
                                 {{item}}</option>
                         </select>
                     </div>
 
-
                     <div class="col col-md-3">
-                        <p class="input-label">weekday</p>
-                        <select id="input-type" class="input input-select" v-model="data_input.day">
-                            <option v-for="(item,index) in map_report.day"
-                                :selected="index == data_input.day ? true : false">{{item
-                                ? item : "NOT AVAILABLE"}}</option>
-                        </select>
-                    </div>
-
-                    <div class="col col-md-3">
-                        <p class="input-label">district</p>
-                        <select id="input-district" class="input input-select" v-model="data_input.district">
-                            <option v-for="(item,index) in districts"
+                        <p class="input-label">stations</p>
+                        <select id="input-district" class="input input-select" v-model="data_input.stations">
+                            <option v-for="(item,index) in selections.stations"
                                 :selected="index == data_input.district ? true : false">{{item}}</option>
                         </select>
                     </div>
@@ -136,23 +147,6 @@
 
             </div>
 
-            <!-- <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col" v-for="item in display_header">
-                                {{item}}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in display_data">
-                            <td scope="col" v-for="key in display_header">
-                                {{item[key]}}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table> -->
-
             <div class="section" v-for="table in table_group"
                 style="width: 100%; height: 500px; border: solid 1px lightgray; margin-bottom: 100px; overflow: auto">
                 <h1>{{table.title}}</h1>
@@ -175,73 +169,78 @@
             </div>
         </div>
     </div>
+    <script>
+        var user = null
+        var app
+
+        var header = new Vue({
+            el: '#header',
+            data: {
+                user: null
+            },
+            methods: {
+                onStart() {
+                    try {
+                        user = JSON.parse(sessionStorage.getItem('user'))
+                        if (typeof user != 'string') {
+                            console.log('success')
+                            this.user = user
+                            app.fetchReports()
+                        } else {
+                            alert('login user account')
+                            this.onLogout()
+                        }
+                    } catch (error) {
+                        console.log(error)
+                        alert('login user account')
+                        this.onLogout()
+                    }
+
+                },
+                onLogout() {
+                    sessionStorage.clear()
+                    window.open('login.html', '_self')
+                }
+            }
+        })
+        $(document).ready(() => {
+            header.onStart()
+        })
+    </script>
 
     <script>
-        var vue_app = new Vue({
+        app = new Vue({
             el: '#content',
             data: {
-                data: [],
-                map_report: {},
-                type: ['all', 'cause', 'establishment_type', 'alarm_level'],
+                reports: [],
+
                 data_input: {
-                    day: null,
                     year: null,
                     month: null,
-                    district: null
+                    station: null
                 },
-                districts: [
-                    'all',
-                    'Sampaloc',
-                    'Tondo',
-                    'Ermita',
-                    'Paco',
-                    'Port Area',
-                    'Pandacan',
-                    'Santa Ana',
-                    'Santa Cruz',
-                    'Quiapo',
-                    'San Miguel',
-                    'Binondo',
-                    'San Andres',
-                    'Malate',
-                    'Intramuros',
-                    'San Nicolas',
-                    'Santa Mesa',
-                    'NOT AVAILABLE',
-                ],
-                filter_types: [
-                    'TIME',
-                    'DATE',
-                    'MONTH',
-                    'YEAR',
-                    'DAY',
-                    'DISTRICT',
-                    'CAUSE',
-                    'ESTABLISHMENT',
-                    'ALERT_LEVEL',
-                    'LATITUDE',
-                    'LONGITUDE',
-                    'AMOUNT_OF_DAMAGE',
-                    'COMPLETE_ADDRESS',
-                    'FATALITY',
-                    'INJURED'
-                ],
-                months: [
-                    'all',
-                    'JANUARY',
-                    'FEBRUARY',
-                    'MARCH',
-                    'APRIL',
-                    'MAY',
-                    'JUNE',
-                    'JULY',
-                    'AUGUST',
-                    'SEPTEMBER',
-                    'OCTOBER',
-                    'NOVEMBER',
-                    'DECEMBER',
-                    'NOT AVAILABLE',
-                ],
+                filter_types: [],
+                selections: {
+                    stations: [],
+                    years: [],
+                    months: [
+                        'all',
+                        'JANUARY',
+                        'FEBRUARY',
+                        'MARCH',
+                        'APRIL',
+                        'MAY',
+                        'JUNE',
+                        'JULY',
+                        'AUGUST',
+                        'SEPTEMBER',
+                        'OCTOBER',
+                        'NOVEMBER',
+                        'DECEMBER',
+                        'NOT AVAILABLE',
+                    ],
+                },
+
 
 
                 filter_added: [],
@@ -254,13 +253,45 @@
                 title: null
             },
             methods: {
-                setData(data, map_report) {
-                    this.data = data
-                    this.map_report = map_report
+                fetchReports() {
 
-                    this.map_report.year = this.map_report.year.sort()
+                    let reports = sessionStorage.getItem('reports')
+                    if (reports) {
+                        this.setData(JSON.parse(reports))
+                    } else {
+                        DataHandler.getReports().then((reports) => {
+                            console.log(reports)
+                            this.setData(reports)
+                        }).catch(error => {
+                            console.log(error)
+                        })
+                    }
+                },
 
-                    console.log(this.map_report)
+                setData(reports) {
+                    this.reports = reports
+                    this.getDistinctParams()
+                },
+
+                getDistinctParams() {
+                    this.selections.years = ['all']
+                    this.selections.stations = ['all']
+
+                    this.reports.map((report) => {
+                        let date = report.DATE_CREATED.split('-')
+                        var year = date[0]
+                        var month = date[1]
+
+                        if (!this.selections.years.includes(year)) {
+                            this.selections.years.push(year)
+                        }
+
+                        if (!this.selections.stations.includes(report.STATION)) {
+                            this.selections.stations.push(report.STATION)
+                        }
+                    })
+
+                    this.filter_types = Object.keys(this.reports[0])
                 },
 
                 update_filter_list(value) {
@@ -294,33 +325,39 @@
 
 
                 generateData() {
-                    let data = this.data
+                    let data = this.reports
                     var title = ""
-                    if (this.data_input.day != 'all' && this.data_input.day != null) {
-                        let filter_day = this.data_input.day
-                        console.log(filter_day)
-                        data = data.filter((item) => {
-                            return (item.DAY != null) ? item.DAY.toLowerCase().includes(filter_day
-                                    .toLowerCase()) :
-                                false
-                        })
-                        title += filter_day + "_"
-                    }
 
                     if (this.data_input.year != 'all' && this.data_input.year != null) {
                         let filter_year = this.data_input.year
                         console.log(filter_year)
                         data = data.filter((item) => {
-                            return (item.YEAR != null) ? item.YEAR.includes(filter_year) : false
+                            let item_year = item.DATE_CREATED.split('-')[0]
+                            if (!this.data_input.year || this.data_input.year == 'all' || this
+                                .data_input.year ==
+                                item_year) {
+                                return true
+                            } else {
+                                return false
+                            }
                         })
                         title += filter_year + "_"
                     }
+
+
                     if (this.data_input.month != 'all' && this.data_input.month != null) {
                         let filter_month = this.data_input.month
                         console.log(filter_month)
                         data = data.filter((item) => {
-                            return (item.MONTH != null) ? item.MONTH.toLowerCase().includes(
-                                filter_month.toLowerCase()) : false
+                            let item_month = item.DATE_CREATED.split('-')[1]
+                            let index_selection_month = this.selections.months.indexOf(this.data_input.month)
+
+                            if (!this.data_input.month || this.data_input.month == 'all' || item_month ==
+                                index_selection_month) {
+                                return true
+                            } else {
+                                return false
+                            }
                         })
                         title += filter_month + "_"
                     }
@@ -339,10 +376,10 @@
                     if (data.length > 0) {
                         var filtered_data = data
 
-                        this.table_group.push(this.createReport1(data))
+                        /* this.table_group.push(this.createReport1(data))
                         this.table_group.push(this.createReport2(data))
                         this.table_group.push(this.createReport3(data))
-                        this.table_group.push(this.createReport4(data))
+                        this.table_group.push(this.createReport4(data)) */
 
                         if (this.filter_added.length > 0) {
                             /* data = this.filter_list(data) */
@@ -361,411 +398,6 @@
                     }
 
 
-                },
-
-
-                createReport1(data) {
-                    let establishment_type = ['Residential', 'Vehicle', 'Unclear', 'Rubbish', 'Commercial',
-                        'Electrical', 'Chemical', 'ReCom', 'Building', 'Grass fire', 'Others'
-                    ]
-                    let district = {
-
-                    }
-                    data.map((item) => {
-                        if (district[item.DISTRICT]) {
-                            district[item.DISTRICT].data.push(item)
-                        } else {
-                            district[item.DISTRICT] = {
-                                data: [item],
-                            }
-                        }
-                    })
-
-                    Object.keys(district).map(key => {
-                        district[key].establishment = {}
-                        for (var i = 0; i < establishment_type.length - 1; i++) {
-                            district[key].establishment[establishment_type[i]] = {
-                                count: 0
-                            }
-                        }
-
-                        let others = district[key].data.filter((item) => {
-                            for (var i = 0; i < establishment_type.length - 1; i++) {
-                                if (item.ESTABLISHMENT == establishment_type[i]) {
-
-                                    if (district[key].establishment[establishment_type[i]]) {
-                                        district[key].establishment[establishment_type[i]]
-                                            .count++
-                                    } else {
-                                        district[key].establishment[establishment_type[i]] = {
-                                            count: 1
-                                        }
-
-                                    }
-                                    return false
-                                }
-                            }
-                            return true
-                        })
-
-                        district[key].establishment['Other'] = {
-                            count: others.length
-                        }
-
-                    })
-
-                    console.log("establishment type %o", district)
-
-
-                    let data_table = Object.keys(district).map((key) => {
-                        var object = {
-                            District: key,
-                        }
-
-                        Object.keys(district[key].establishment).map(establishment => {
-                            object[establishment] = district[key].establishment[establishment]
-                                .count ||
-                                0
-                        })
-                        object['Total'] = district[key].data.length
-                        return object
-                    })
-
-                    let header_table = Object.keys(data_table[0])
-
-                    return {
-                        header: header_table,
-                        data: data_table,
-                        title: 'Establishment Type'
-                    }
-                },
-
-                createReport2(data) {
-                    let alert_level_type = ['1st Alarm', '2nd Alarm', '3rd Alarm', 'Other']
-                    let district = {
-
-                    }
-                    data.map((item) => {
-                        if (district[item.DISTRICT]) {
-                            district[item.DISTRICT].data.push(item)
-                        } else {
-                            district[item.DISTRICT] = {
-                                data: [item],
-                            }
-                        }
-                    })
-
-                    Object.keys(district).map(key => {
-                        district[key].alert_levels = {}
-                        for (var i = 0; i < alert_level_type.length - 1; i++) {
-                            district[key].alert_levels[alert_level_type[i]] = {
-                                count: 0
-                            }
-                        }
-
-                        let others = district[key].data.filter((item) => {
-                            for (var i = 0; i < alert_level_type.length - 1; i++) {
-                                if (item.ALERT_LEVEL == alert_level_type[i]) {
-
-                                    if (district[key].alert_levels[alert_level_type[i]]) {
-                                        district[key].alert_levels[alert_level_type[i]].count++
-                                    } else {
-                                        district[key].alert_levels[alert_level_type[i]] = {
-                                            count: 1
-                                        }
-
-                                    }
-                                    return false
-                                }
-                            }
-                            return true
-                        })
-
-                        district[key].alert_levels['Other'] = {
-                            count: others.length
-                        }
-
-                    })
-
-                    console.log("establishment type %o", district)
-
-
-                    let data_table = Object.keys(district).map((key) => {
-
-                        var object = {
-                            District: key
-                        }
-
-                        Object.keys(district[key].alert_levels).map(alert_level_key => {
-                            object[alert_level_key] = district[key].alert_levels[
-                                    alert_level_key].count ||
-                                0
-                        })
-
-                        object['Total'] = district[key].data.length
-
-                        return object
-                    })
-
-                    let header_table = Object.keys(data_table[0])
-
-
-                    return {
-                        header: header_table,
-                        data: data_table,
-                        title: 'Alert Level'
-                    }
-                },
-
-                createReport3(data) {
-                    let causes_type = ['Firecracker',
-                        'Electrical connection',
-                        'LPG Leak',
-                        'Gas',
-                        'Keresone',
-                        'Charcoal Stove',
-                        'Under Investigation',
-                        'Cigarette Butt',
-                        'Arson',
-                        'Candle',
-                        'Air-conditioned Fire/Air-cooler/Fan',
-                        'Matress Fire',
-                        'Open flame',
-                        'Electrical Appliances',
-                        'flat iron',
-                        'Acetylene',
-                        'Alcohol Lamp Fire',
-                        'Welding',
-                        'Battery-related / Cellphone / Charger',
-                        'Chimney Fire',
-                        'Spontaneous combustion',
-                        'Christmas light'
-                    ]
-                    let district = {
-
-                    }
-                    data.map((item) => {
-                        if (district[item.DISTRICT]) {
-                            district[item.DISTRICT].data.push(item)
-                        } else {
-                            district[item.DISTRICT] = {
-                                data: [item],
-                            }
-                        }
-                    })
-
-                    Object.keys(district).map(key => {
-                        district[key].causes = {}
-                        for (var i = 0; i < causes_type.length - 1; i++) {
-                            district[key].causes[causes_type[i]] = {
-                                count: 0
-                            }
-                        }
-
-                        let others = district[key].data.filter((item) => {
-                            for (var i = 0; i < causes_type.length - 1; i++) {
-                                try {
-                                    if (item.CAUSE.toLowerCase().indexOf(causes_type[i]
-                                            .toLowerCase()) !==
-                                        -1 ||
-                                        causes_type[i].toLowerCase().indexOf(item.CAUSE
-                                            .toLowerCase()) !==
-                                        -1) {
-
-                                        if (district[key].causes[causes_type[i]]) {
-                                            district[key].causes[causes_type[i]].count++
-                                        } else {
-                                            district[key].causes[causes_type[i]] = {
-                                                count: 1
-                                            }
-
-                                        }
-                                        return false
-                                    }
-                                } catch {
-
-                                }
-
-                            }
-                            return true
-                        })
-
-                        district[key].causes['Other'] = {
-                            count: others.length
-                        }
-
-                    })
-
-                    console.log("establishment type %o", district)
-
-
-                    let data_table = Object.keys(district).map((key) => {
-
-                        var object = {
-                            District: key
-                        }
-
-                        Object.keys(district[key].causes).map(cause_key => {
-                            object[cause_key] = district[key].causes[
-                                    cause_key].count ||
-                                0
-                        })
-
-                        object['Total'] = district[key].data.length
-
-                        return object
-                    })
-                    console.log(data_table)
-                    let header_table = Object.keys(data_table[0])
-
-                    return {
-                        header: header_table,
-                        data: data_table,
-                        title: 'Causes'
-                    }
-                },
-
-                createReport4(data) {
-                    let establishment_type = {
-                        'Residential': {
-                            data: []
-                        },
-                        'Vehicle': {
-                            data: []
-                        },
-                        'Unclear': {
-                            data: []
-                        },
-                        'Rubbish': {
-                            data: []
-                        },
-                        'Commercial': {
-                            data: []
-                        },
-                        'Electrical': {
-                            data: []
-                        },
-                        'Chemical': {
-                            data: []
-                        },
-                        'ReCom': {
-                            data: []
-                        },
-                        'Building': {
-                            data: []
-                        },
-                        'Grass fire': {
-                            data: []
-                        },
-                        'Others': {
-                            data: []
-                        }
-                    }
-
-                    let causes_type = ['Firecracker',
-                        'Electrical connection',
-                        'LPG Leak',
-                        'Gas',
-                        'Keresone',
-                        'Charcoal Stove',
-                        'Under Investigation',
-                        'Cigarette Butt',
-                        'Arson',
-                        'Candle',
-                        'Air-conditioned Fire/Air-cooler/Fan',
-                        'Matress Fire',
-                        'Open flame',
-                        'Electrical Appliances',
-                        'flat iron',
-                        'Acetylene',
-                        'Alcohol Lamp Fire',
-                        'Welding',
-                        'Battery-related / Cellphone / Charger',
-                        'Chimney Fire',
-                        'Spontaneous combustion',
-                        'Christmas light'
-                    ]
-
-                    data.map((item) => {
-                        if (establishment_type[item.ESTABLISHMENT]) {
-                            establishment_type[item.ESTABLISHMENT].data.push(item)
-                        } else {
-                            establishment_type['Others'].data.push(item)
-                        }
-                    })
-
-
-                    Object.keys(establishment_type).map(key => {
-                        establishment_type[key].causes = {}
-                        for (var i = 0; i < causes_type.length - 1; i++) {
-                            establishment_type[key].causes[causes_type[i]] = {
-                                count: 0
-                            }
-                        }
-
-                        let others = establishment_type[key].data.filter((item) => {
-                            for (var i = 0; i < causes_type.length - 1; i++) {
-                                try {
-                                    if (item.CAUSE.toLowerCase().indexOf(causes_type[i]
-                                            .toLowerCase()) !==
-                                        -1 ||
-                                        causes_type[i].toLowerCase().indexOf(item.CAUSE
-                                            .toLowerCase()) !==
-                                        -1) {
-
-                                        if (establishment_type[key].causes[causes_type[i]]) {
-                                            establishment_type[key].causes[causes_type[i]]
-                                                .count++
-                                        } else {
-                                            establishment_type[key].causes[causes_type[i]] = {
-                                                count: 1
-                                            }
-
-                                        }
-                                        return false
-                                    }
-                                } catch {
-
-                                }
-
-                            }
-                            return true
-                        })
-
-                        establishment_type[key].causes['Other'] = {
-                            count: others.length
-                        }
-
-                    })
-
-                    console.log("establishment type %o", establishment_type)
-
-
-                    let data_table = Object.keys(establishment_type).map((key) => {
-
-                        var object = {
-                            District: key
-                        }
-
-                        Object.keys(establishment_type[key].causes).map(cause_key => {
-                            object[cause_key] = establishment_type[key].causes[
-                                    cause_key].count ||
-                                0
-                        })
-
-                        object['Total'] = establishment_type[key].data.length
-
-                        return object
-                    })
-                    console.log(data_table)
-                    let header_table = Object.keys(data_table[0])
-
-
-                    return {
-                        header: header_table,
-                        data: data_table,
-                        title: 'Causes and type of Establishment involved'
-                    }
                 },
 
                 download(isXls) {
@@ -829,71 +461,8 @@
                 map_report[key].push(data)
             }
         }
-
-        function onHandleData(data) {
-            new Promise((resolve, reject) => {
-                console.log(data)
-                generateMap("day", "all")
-                generateMap("year", "all")
-                data.map(element => {
-                    generateMap("date", element.DATE)
-                    generateMap("cause", element.CAUSE)
-                    generateMap("alarm", element.ALERT_LEVEL)
-                    generateMap("year", element.YEAR)
-                    generateMap("day", element.DAY)
-                    //generateMap("temp", element.temperature)
-                    generateMap("type", element.ESTABLISHMENT)
-                    generateMap("district", element.DISTRICT)
-                })
-
-                var filter_data = data.filter((item) => {
-                    return (user.type == 'Admin' || item.USERID == user.id)
-                })
-
-                if (filter_data.length > 0) {
-                    filter_data = filter_data.map((item) => {
-                        delete item['COMPLETE_ADDRESS']
-                        delete item['FATALITY']
-                        delete item['INJURED']
-                        return item
-                    })
-                }
-
-                console.log(map_report)
-                resolve(filter_data)
-            }).then((filter_data) => {
-                console.log(filter_data)
-                vue_app.setData(filter_data, map_report)
-            })
-
-        }
     </script>
-    <script>
-        var user = null
-        var header = new Vue({
-            el: '#header',
-            methods: {
-                onStart() {
-                    user = JSON.parse(sessionStorage.getItem('user'))
-                    console.log(user)
 
-                    if (user) {
-                        console.log('success')
-                        getReports(true, onHandleData)
-                    } else {
-                        alert('login user account')
-                        this.onLogout()
-                    }
-                },
-                onLogout() {
-                    sessionStorage.removeItem('user')
-                    window.open('login.html', '_self')
-                }
-            }
-        })
-
-        header.onStart()
-    </script>
     <script type="text/javascript">
         function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
             console.log(JSONData)
@@ -993,8 +562,8 @@
             xls.exportToXLS('BFPFireReport_' + title + '.xls');
         }
 
-        function ExportPDF(data,fileName) {
-            console.log("data %o",data)
+        function ExportPDF(data, fileName) {
+            console.log("data %o", data)
             window.sessionStorage.setItem('pdfname', fileName)
             window.sessionStorage.setItem('pdftoprint', data)
             window.open('pdf_generate.html', '_blank')

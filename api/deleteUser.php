@@ -2,17 +2,22 @@
 header("Access-Control-Allow-Origin: *");
 error_reporting(0);
 include 'access.php';
+
+$id                 = $_POST['id'];
 $conn = OpenCon();
-$id = $_POST['ID'];
-$sql = "delete from reports where ID=$id";
+
+$sql = "delete from `user` where id = $id";
 
 $message;
+
 if ($conn->query($sql) === TRUE) {
     $message->message = "success";
 } else {
-    $message->error = "error" .$conn->error;
+    $message->error = "error";
     $message->params = $sql;
 }
 
 echo json_encode($message);
-CloseCon();
+
+CloseCon($conn);
+?>
