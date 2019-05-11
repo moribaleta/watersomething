@@ -51,6 +51,22 @@ class DataHandlerClass {
     editReport(params) {
         return this.postApi(`${this.baseUrl}/editreports.php`, params)
     }
+
+    getUsers(){
+        return this.fetchApi(`${this.baseUrl}/getUsers.php`)
+    }
+
+    addUser(params){
+        return this.postApi(`${this.baseUrl}/addUser.php`, params)
+    }
+
+    deleteUser(id){
+        return this.postApi(`${this.baseUrl}/deleteUser.php`,{id})
+    }
+
+    editUser(params){
+        return this.postApi(`${this.baseUrl}/editUser.php`, params)
+    }
 }
 
 let DataHandler = new DataHandlerClass()
