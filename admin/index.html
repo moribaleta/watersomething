@@ -44,6 +44,26 @@
             animation: spin 2s linear infinite;
         }
 
+        .button-filter-container {
+            margin-top: 10px;
+            margin-bottom: 10px;
+
+        }
+
+        .button-filter {
+            height: 30px;
+        }
+
+        .button-container {
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+        }
+
+        .button-view {
+            margin-right: 10px;
+        }
 
 
         @keyframes spin {
@@ -97,7 +117,7 @@
         </div>
 
         <div class="section" v-if="!isDataLoading">
-            <div class="input-container" style="padding-bottom: 50px; margin-bottom: 50px; align-items: center">
+            <div class="well input-container" style="padding:10px; width: 100%; min-height: 70px">
                 <div class="col col-md-2">
                     <p class="input-label">year</p>
                     <select id="input-type" class="input input-select" v-model="filter.year">
@@ -114,7 +134,6 @@
                             {{item}}</option>
                     </select>
                 </div>
-
                 <div class="col col-md-2">
                     <p class="input-label">stations</p>
                     <select id="input-district" class="input input-select" v-model="filter.station">
@@ -123,21 +142,18 @@
                             {{item}}</option>
                     </select>
                 </div>
-
                 <div class="col col-md-3 button-filter-container">
-                    <button type="button" id="add-report" class="btn btn-warning button-view button-filter"
+                    <button type="button" class="btn btn-warning button-view button-filter"
                         v-on:click="filterList()">filter
                     </button>
                 </div>
 
             </div>
             <div class="button-container">
-                <button type="button" id="add-report" class="btn btn-success button-view"
-                    v-on:click="openAddReport()">add
+                <button type="button" class="btn btn-info button-view" v-on:click="openAddReport()">add
                     report
                 </button>
-                <button type="button" id="add-report" class="btn btn-success button-view"
-                    v-on:click="openGenerateReport()">
+                <button type="button" class="btn btn-info button-view" v-on:click="openGenerateReport()">
                     generate
                     report
                 </button>

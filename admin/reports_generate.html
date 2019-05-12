@@ -49,8 +49,14 @@
             width: 100%;
         }
 
+
+        .filter-container {
+            width: 100%;
+            
+        }
+
         .button-container {
-            padding-top: 100px;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -85,89 +91,93 @@
             </a>
         </div>
     </div>
-    <div id='content' style="padding-top: 50px">
-        <div class="container">
-            <div class="section">
-                <h2>Generate Reports</h2>
+    <div id='content' class="container">
 
-                <a href="#demo" data-toggle="collapse">Show Filter</a>
+        <div class="section row">
+            <div class="col col-md-12 header-content">
+                <button class="btn header-btn" v-on:click="onBack()">
+                    <i class="large material-icons">arrow_back</i>
+                </button>
+                <h1 class="header-title">Generate Reports</h1>
+            </div>
 
-                <div id="demo" class="collapse">
+            <div class="col col-md-12 filter-container">
+                <a class="btn btn-info " href="#labels" data-toggle="collapse">Show Labels</a>
+                <a class="btn btn-info " href="#filter" data-toggle="collapse">Show Filter</a>
+
+                <div id="labels" class="well collapse">
                     <div class="filter-div row">
                         <div class="filter_item col-md-3" v-for="filter_type,index of filter_types">
                             <input type="radio" class="radio" :value="filter_type"
                                 v-on:click="update_filter_list(filter_type)" :checked="getChecked(filter_type)">
-                            <label :for="filter_type">{{filter_type}}</label>
+                            <label :for="filter_type">{{filter_type.replace(/_/g,' ')}}</label>
                         </div>
                     </div>
                 </div>
-                <div class="input-container">
-                    <div class="col col-md-3">
-                        <p class="input-label">year</p>
-                        <select id="input-type" class="input input-select" v-model="data_input.year">
-                            <option v-for="(item,index) in selections.years"
-                                :selected="item == data_input.year ? true : false">{{item
-                                ? item : "NOT AVAILABLE"}}</option>
-                        </select>
+                <div id="filter" class="well collapse">
+                    <div class="row">
+                        <div class="col col-md-3">
+                            <p class="input-label">year</p>
+                            <select id="input-type" class="input input-select" v-model="data_input.year">
+                                <option v-for="(item,index) in selections.years"
+                                    :selected="item == data_input.year ? true : false">{{item
+                                            ? item : "NOT AVAILABLE"}}</option>
+                            </select>
+                        </div>
+                        <div class="col col-md-3">
+                            <p class="input-label">month</p>
+                            <select id="input-type" class="input input-select" v-model="data_input.month">
+                                <option v-for="(item,index) in selections.months"
+                                    :selected="index == data_input.month ? true : false">
+                                    {{item}}</option>
+                            </select>
+                        </div>
+                        <div class="col col-md-3">
+                            <p class="input-label">stations</p>
+                            <select id="input-district" class="input input-select" v-model="data_input.station">
+                                <option v-for="(item,index) in selections.stations"
+                                    :selected="index == data_input.station ? true : false">{{item}}</option>
+                            </select>
+                        </div>
                     </div>
-                    <div class="col col-md-3">
-                        <p class="input-label">month</p>
-                        <select id="input-type" class="input input-select" v-model="data_input.month">
-                            <option v-for="(item,index) in selections.months"
-                                :selected="index == data_input.month ? true : false">
-                                {{item}}</option>
-                        </select>
-                    </div>
-
-                    <div class="col col-md-3">
-                        <p class="input-label">stations</p>
-                        <select id="input-district" class="input input-select" v-model="data_input.stations">
-                            <option v-for="(item,index) in selections.stations"
-                                :selected="index == data_input.district ? true : false">{{item}}</option>
-                        </select>
-                    </div>
-
                 </div>
-
-
-                <div class="button-container">
-                    <button type="button" id="add-report" class="btn btn-success button-view"
-                        v-on:click="generateData()">generate
-                        report
-                    </button>
-                    <button type="button" id="add-report" class="btn btn-success button-view"
-                        v-on:click="download(true)">
-                        download xls
-                    </button>
-                    <button type="button" id="add-report" class="btn btn-success button-view"
-                        v-on:click="download(false)">
-                        download pdf
-                    </button>
-                </div>
-
             </div>
 
-            <div class="section" v-for="table in table_group"
-                style="width: 100%; height: 500px; border: solid 1px lightgray; margin-bottom: 100px; overflow: auto">
-                <h1>{{table.title}}</h1>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th scope="col" v-for="item in table.header">
-                                {{item}}
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="item in table.data">
-                            <td scope="col" v-for="key in table.header">
-                                {{item[key]}}
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="col col-md-12 button-container">
+                <button type="button" id="add-report" class="btn btn-info button-view"
+                    v-on:click="generateData()">generate
+                    report
+                </button>
+                <button type="button" id="add-report" class="btn btn-info button-view" v-on:click="download(true)">
+                    download xls
+                </button>
+                <button type="button" id="add-report" class="btn btn-info button-view" v-on:click="download(false)">
+                    download pdf
+                </button>
             </div>
         </div>
+
+        <div class="section" v-for="table in table_group"
+            style="width: 100%; height: 500px; border: solid 1px lightgray; margin-bottom: 100px; overflow: auto">
+            <h1>{{table.title}}</h1>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col" v-for="item in table.header">
+                            {{item.replace(/_/g,' ')}}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in table.data">
+                        <td scope="col" v-for="key in table.header">
+                            {{item[key]}}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
     </div>
     <script>
         var user = null
@@ -241,8 +251,6 @@
                     ],
                 },
 
-
-
                 filter_added: [],
 
                 display_data: [],
@@ -254,7 +262,6 @@
             },
             methods: {
                 fetchReports() {
-
                     let reports = sessionStorage.getItem('reports')
                     if (reports) {
                         this.setData(JSON.parse(reports))
@@ -266,6 +273,10 @@
                             console.log(error)
                         })
                     }
+                },
+
+                onBack() {
+                    window.history.back()
                 },
 
                 setData(reports) {
@@ -341,7 +352,7 @@
                                 return false
                             }
                         })
-                        title += filter_year + "_"
+                        title += filter_year + " "
                     }
 
 
@@ -350,55 +361,49 @@
                         console.log(filter_month)
                         data = data.filter((item) => {
                             let item_month = item.DATE_CREATED.split('-')[1]
-                            let index_selection_month = this.selections.months.indexOf(this.data_input.month)
+                            let index_selection_month = this.selections.months.indexOf(this.data_input
+                                .month)
 
-                            if (!this.data_input.month || this.data_input.month == 'all' || item_month ==
+                            if (!this.data_input.month || this.data_input.month == 'all' ||
+                                item_month ==
                                 index_selection_month) {
                                 return true
                             } else {
                                 return false
                             }
                         })
-                        title += filter_month + "_"
+                        title += filter_month + " "
                     }
-                    if (this.data_input.district != 'all' && this.data_input.district != null) {
-                        let filter_district = this.data_input.district
-                        console.log(filter_district)
+                    if (this.data_input.station != 'all' && this.data_input.station != null) {
+                        let filter_station = this.data_input.station
+                        console.log(filter_station)
                         data = data.filter((item) => {
-                            return (item.DISTRICT != null) ? item.DISTRICT.toLowerCase().includes(
-                                filter_district.toLowerCase()) : false
+                            return item.STATION = filter_station
                         })
-                        title += filter_district
+                        title += filter_station
                     }
 
                     console.log(data)
 
+
                     if (data.length > 0) {
+                        this.table_group = []
+
                         var filtered_data = data
 
-                        /* this.table_group.push(this.createReport1(data))
-                        this.table_group.push(this.createReport2(data))
-                        this.table_group.push(this.createReport3(data))
-                        this.table_group.push(this.createReport4(data)) */
-
                         if (this.filter_added.length > 0) {
-                            /* data = this.filter_list(data) */
-
                             filtered_data = this.filter_list(data)
                             console.log('filtered %o', data)
                         }
 
-
-
                         this.table_group.push({
                             header: Object.keys(data[0]),
                             data: filtered_data,
-                            title: title + 'report'
+                            title: title + ' report'
                         })
                     }
-
-
                 },
+
 
                 download(isXls) {
                     if (this.table_group.length > 0) {
@@ -416,51 +421,6 @@
                 }
             }
         })
-
-        function cleanData(type, data) {
-
-            if (type == 'alarm_level') {
-                data = data.map((item) => {
-                    delete item.cause
-                    delete item.establishment_type
-                    return item
-                })
-            } else if (type == 'cause') {
-                data = data.map((item) => {
-                    delete item.alarm_level
-                    delete item.establishment_type
-                    return item
-                })
-            } else {
-                data = data.map((item) => {
-                    delete item.cause
-                    delete item.alarm_level
-                    return item
-                })
-            }
-            console.log(data)
-            return data
-        }
-
-        var map_report = {
-            month: [],
-            year: [],
-            cause: [],
-            alarm: [],
-            temp: [],
-            type: [],
-            district: [],
-            day: [],
-            date: []
-        }
-
-        function generateMap(key, data) {
-            if (map_report[key].includes(data)) {
-                return
-            } else {
-                map_report[key].push(data)
-            }
-        }
     </script>
 
     <script type="text/javascript">
@@ -529,7 +489,7 @@
             }
 
             //Generate a file name
-            var fileName = "BFPFireReport_";
+            var fileName = "LagunaWaterReserverReport";
             //this will remove the blank-spaces from the title and replace it with an underscore
             fileName += ReportTitle.replace(/ /g, "_");
             ExportPDF(CSV, fileName)
@@ -559,7 +519,7 @@
     <script>
         function ExportExcel(data, title) {
             var xls = new XlsExport(data);
-            xls.exportToXLS('BFPFireReport_' + title + '.xls');
+            xls.exportToXLS('LagunaWaterReserveReport' + title + '.xls');
         }
 
         function ExportPDF(data, fileName) {
