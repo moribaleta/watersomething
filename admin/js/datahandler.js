@@ -2,7 +2,7 @@
 
 class DataHandlerClass {
 
-    host = "http://192.168.0.21/"
+    host = "http://192.168.254.103/"
     baseUrl = this.host + "watersomething/api"
 
     fetchApi(url, param = {}){
