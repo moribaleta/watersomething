@@ -194,9 +194,8 @@
                 onStart() {
                     try {
                         user = JSON.parse(sessionStorage.getItem('user'))
-
-                        if (typeof user != 'string') {
-                            console.log('success')
+                        if (typeof user != 'string' && user) {
+                            console.log(user)
                             this.user = user
                             app.fetchReports()
                         } else {
@@ -207,13 +206,16 @@
                         alert('login user account')
                         this.onLogout()
                     }
-
                 },
                 onLogout() {
                     sessionStorage.clear()
                     window.open('login.html', '_self')
                 }
             }
+        })
+
+        $(document).ready(() => {
+            header.onStart()
         })
 
 
@@ -257,7 +259,6 @@
                 fetchReports() {
                     this.setLoading(true)
                     DataHandler.getReports().then((reports) => {
-                        console.log(reports)
                         this.setData(reports)
                     }).catch(error => {
                         console.log(error)
@@ -372,10 +373,6 @@
 
 
             }
-        })
-
-        $(document).ready(() => {
-            header.onStart()
         })
     </script>
 

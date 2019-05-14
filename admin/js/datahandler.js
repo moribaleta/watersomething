@@ -36,7 +36,7 @@ class DataHandlerClass {
     }
 
     getReports(){
-        return this.fetchApi(`${this.baseUrl}/getreports.php`)
+        return this.fetchApi(`${this.baseUrl}/getreports.php?i=1`)
     }
 
     saveReport(params) {

@@ -107,7 +107,7 @@
         <h1>Users</h1>
         <div class="section" v-if="user_list.length > 0">
             <div class="button-container">
-                <button type="button" id="add-report" class="btn btn-success button-view"
+                <button type="button" id="add-report" class="btn btn-info button-view"
                     v-on:click="openAddUserModal(false)">add User
                 </button>
             </div>
@@ -147,8 +147,8 @@
                     try {
                         user = JSON.parse(sessionStorage.getItem('user'))
                         
-                        if (typeof user != 'string') {
-                            console.log('success')
+                        if (typeof user != 'string' && user) {
+                            console.log(user)
                             this.user = user
                             if(this.user.type == 'ADMIN'){
                                 app.fetchUser()
