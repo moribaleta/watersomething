@@ -2,7 +2,7 @@
 
 class DataHandlerClass {
 
-    host = "http://192.168.0.21/"
+    host = "http://192.168.254.102/"
     baseUrl = this.host + "watersomething/api"
 
     fetchApi(url, param = {}){
@@ -36,7 +36,7 @@ class DataHandlerClass {
     }
 
     getReports(){
-        return this.fetchApi(`${this.baseUrl}/getreports.php`)
+        return this.fetchApi(`${this.baseUrl}/getreports.php?i=1`)
     }
 
     saveReport(params) {

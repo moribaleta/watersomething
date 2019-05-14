@@ -192,8 +192,8 @@
                 onStart() {
                     try {
                         user = JSON.parse(sessionStorage.getItem('user'))
-                        if (typeof user != 'string') {
-                            console.log('success')
+                        if (typeof user != 'string' && user) {
+                            console.log(user)
                             this.user = user
                             app.fetchReports()
                         } else {
