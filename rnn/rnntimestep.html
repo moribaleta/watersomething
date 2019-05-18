@@ -2542,12 +2542,18 @@
         }
 
         function test() {
-            let randIndex = Math.floor(Math.random() * training_data.length);
-            let sampleTest = training_data[randIndex]
-            console.log(sampleTest)
+
+            var test_data = []
+            for (var i = 0; i < 5; i++) {
+                let randIndex = Math.floor(Math.random() * training_data.length);
+                let sampleTest = training_data[randIndex]
+                test_data.push(sampleTest)
+            }
+
+            /* console.log(sampleTest) */
             /* let output = net.run(sampleTest) */
 
-            let output = net.forecast([sampleTest], 5)
+            let output = net.forecast(test_data, 5)
 
             let forcast_reports = output.map((forecast) => {
                 return {
@@ -2569,7 +2575,7 @@
             })
 
             console.log(output_grade)
-            document.getElementById('input').innerHTML = JSON.stringify(sampleTest)
+            document.getElementById('input').innerHTML = JSON.stringify(test_data)
             document.getElementById('output').innerHTML = JSON.stringify(output_grade)
         }
 
@@ -2641,6 +2647,7 @@
 
         function computeFunction1(report) {
             let n = Object.keys(report).length
+
             let failed = Object.keys(report).map(key => {
                 let value = report[key]
                 return getBestWorst(key, value)
@@ -2693,7 +2700,6 @@
             })
             let normalized = sum_excursions / n
             return (normalized / ((0.01 * normalized) + 0.01))
-
         }
 
         function computeExcursion(test) {
@@ -2721,7 +2727,6 @@
                             passed: value < 8 && value >= 7,
                             value,
                             type
-
                     }
                     case 'AMMONIA_TOTAL_MGL_N':
                         return {

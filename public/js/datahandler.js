@@ -1,14 +1,16 @@
-const domain = "http://192.168.254.100/"
-const baseurl = domain + 'watersomething/api/'
+const domain = "https://lagunawaterreserve.000webhostapp.com/"
+const baseurl = domain + "api/"
 
 class Datahandler {
 
-    fetchApi(url, param = {}){
-        return new Promise((resolve,reject) => {
-            $.get(url,param,function (data, status) {
-                if (status == "success"){
+    fetchApi(url, param = {}) {
+        return new Promise((resolve, reject) => {
+            $.get(url, param, function (data, status) {
+                if (status == "success") {
+                    console.log(data)
                     resolve(JSON.parse(data))
-                }else{
+                    /* resolve(data) */
+                } else {
                     reject(status)
                 }
             });
@@ -18,7 +20,7 @@ class Datahandler {
     /**
      * returns a promise report from the database
      */
-    getReports(){
+    getReports() {
         let url = baseurl + 'getreports.php'
         return this.fetchApi(url)
     }

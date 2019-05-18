@@ -2,8 +2,8 @@
 
 class DataHandlerClass {
 
-    host = "http://192.168.254.103/"
-    baseUrl = this.host + "watersomething/api"
+    host = "https://lagunawaterreserve.000webhostapp.com/"
+    baseUrl = this.host + "api"
 
     fetchApi(url, param = {}){
         return new Promise((resolve,reject) => {
