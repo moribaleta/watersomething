@@ -2,10 +2,10 @@
 
 function OpenCon()
 {
-    $dbhost = "sql107.epizy.com";
-    $dbuser = "epiz_23898690";
-    $dbpass = "vKl9KoxcMe";
-    $db = "epiz_23898690_basic_database";
+    $dbhost = "localhost";
+    $dbuser = "id9573072_basic_database";
+    $dbpass = "abcd1234";
+    $db = "id9573072_basic_database";
 
     $conn = new mysqli($dbhost, $dbuser, $dbpass, $db) or die("Connect failed: %s\n" . $conn->error);
 
