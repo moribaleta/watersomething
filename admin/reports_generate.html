@@ -336,13 +336,16 @@
 
 
                 generateData() {
-                    let data = this.reports
+                    let data = JSON.parse(JSON.stringify(this.reports))
                     var title = ""
+
+                    console.log("data available %o", data)
 
                     if (this.data_input.year != 'all' && this.data_input.year != null) {
                         let filter_year = this.data_input.year
                         console.log(filter_year)
                         data = data.filter((item) => {
+                            console.log("item per %o", item)
                             let item_year = item.DATE_CREATED.split('-')[0]
                             if (!this.data_input.year || this.data_input.year == 'all' || this
                                 .data_input.year ==

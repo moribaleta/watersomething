@@ -2,6 +2,7 @@
 <header>
     <script src="js/brain.js"></script>
     <script src="js/data.js"></script>
+    <script src="js/wqi_calculator.js"></script>
 </header>
 
 <body>
@@ -911,18 +912,151 @@
         const net = new brain.recurrent.LSTMTimeStep();
 
         var sample_data = []
-        var test_data = []
+        var test_data = [{
+            "ID": "1251",
+            "STATION": "Station 17",
+            "DATE_CREATED": "2017-01-08",
+            "PH": "8.70000",
+            "AMMONIA_TOTAL_MGL_N": "0.00100",
+            "NITRATE_TOTAL_MGLASN": "0.19000",
+            "INORGANIC_PHOSPHATE": "0.05700",
+            "BOD": "3.00000",
+            "DISSOLVED_OXYGEN_MGL": "9.60000",
+            "FECAL_COLIFORMS": "76.00000",
+            "WATER_QUALITY_INDEX": "GOOD",
+            "USERID": "0"
+        }, {
+            "ID": "1260",
+            "STATION": "Station 17",
+            "DATE_CREATED": "2017-02-16",
+            "PH": "8.10000",
+            "AMMONIA_TOTAL_MGL_N": "0.04000",
+            "NITRATE_TOTAL_MGLASN": "2.59200",
+            "INORGANIC_PHOSPHATE": "0.14500",
+            "BOD": "1.00000",
+            "DISSOLVED_OXYGEN_MGL": "7.70000",
+            "FECAL_COLIFORMS": "86.00000",
+            "WATER_QUALITY_INDEX": "GOOD",
+            "USERID": "0"
+        }, {
+            "ID": "1269",
+            "STATION": "Station 17",
+            "DATE_CREATED": "2017-03-14",
+            "PH": "8.30000",
+            "AMMONIA_TOTAL_MGL_N": "0.02300",
+            "NITRATE_TOTAL_MGLASN": "0.22100",
+            "INORGANIC_PHOSPHATE": "0.07200",
+            "BOD": "2.00000",
+            "DISSOLVED_OXYGEN_MGL": "8.50000",
+            "FECAL_COLIFORMS": "188.00000",
+            "WATER_QUALITY_INDEX": "FAIR",
+            "USERID": "0"
+        }, {
+            "ID": "1278",
+            "STATION": "Station 17",
+            "DATE_CREATED": "2017-04-06",
+            "PH": "7.90000",
+            "AMMONIA_TOTAL_MGL_N": "0.05100",
+            "NITRATE_TOTAL_MGLASN": "0.00400",
+            "INORGANIC_PHOSPHATE": "0.16900",
+            "BOD": "2.00000",
+            "DISSOLVED_OXYGEN_MGL": "7.00000",
+            "FECAL_COLIFORMS": "272.00000",
+            "WATER_QUALITY_INDEX": "MARGINAL",
+            "USERID": "0"
+        }, {
+            "ID": "1287",
+            "STATION": "Station 17",
+            "DATE_CREATED": "2017-05-14",
+            "PH": "8.20000",
+            "AMMONIA_TOTAL_MGL_N": "0.01600",
+            "NITRATE_TOTAL_MGLASN": "0.00100",
+            "INORGANIC_PHOSPHATE": "0.09800",
+            "BOD": "4.00000",
+            "DISSOLVED_OXYGEN_MGL": "7.60000",
+            "FECAL_COLIFORMS": "586.00000",
+            "WATER_QUALITY_INDEX": "MARGINAL",
+            "USERID": "0"
+        }, {
+            "ID": "1296",
+            "STATION": "Station 17",
+            "DATE_CREATED": "2017-06-13",
+            "PH": "8.50000",
+            "AMMONIA_TOTAL_MGL_N": "0.00100",
+            "NITRATE_TOTAL_MGLASN": "0.00100",
+            "INORGANIC_PHOSPHATE": "0.13200",
+            "BOD": "2.00000",
+            "DISSOLVED_OXYGEN_MGL": "10.20000",
+            "FECAL_COLIFORMS": "303.00000",
+            "WATER_QUALITY_INDEX": "FAIR",
+            "USERID": "0"
+        }, {
+            "ID": "1305",
+            "STATION": "Station 17",
+            "DATE_CREATED": "2017-07-10",
+            "PH": "8.10000",
+            "AMMONIA_TOTAL_MGL_N": "0.04800",
+            "NITRATE_TOTAL_MGLASN": "0.01200",
+            "INORGANIC_PHOSPHATE": "0.15000",
+            "BOD": "4.00000",
+            "DISSOLVED_OXYGEN_MGL": "8.10000",
+            "FECAL_COLIFORMS": "343.00000",
+            "WATER_QUALITY_INDEX": "MARGINAL",
+            "USERID": "0"
+        }, {
+            "ID": "1314",
+            "STATION": "Station 17",
+            "DATE_CREATED": "2017-08-17",
+            "PH": "9.20000",
+            "AMMONIA_TOTAL_MGL_N": "0.03000",
+            "NITRATE_TOTAL_MGLASN": "0.00100",
+            "INORGANIC_PHOSPHATE": "0.10500",
+            "BOD": "4.00000",
+            "DISSOLVED_OXYGEN_MGL": "14.10000",
+            "FECAL_COLIFORMS": "140.00000",
+            "WATER_QUALITY_INDEX": "MARGINAL",
+            "USERID": "0"
+        }, {
+            "ID": "1323",
+            "STATION": "Station 17",
+            "DATE_CREATED": "2017-09-11",
+            "PH": "8.30000",
+            "AMMONIA_TOTAL_MGL_N": "0.00100",
+            "NITRATE_TOTAL_MGLASN": "0.00100",
+            "INORGANIC_PHOSPHATE": "0.25200",
+            "BOD": "4.00000",
+            "DISSOLVED_OXYGEN_MGL": "8.70000",
+            "FECAL_COLIFORMS": "272.00000",
+            "WATER_QUALITY_INDEX": "MARGINAL",
+            "USERID": "0"
+        }, {
+            "ID": "1332",
+            "STATION": "Station 17",
+            "DATE_CREATED": "2017-10-13",
+            "PH": "8.20000",
+            "AMMONIA_TOTAL_MGL_N": "0.03100",
+            "NITRATE_TOTAL_MGLASN": "0.00100",
+            "INORGANIC_PHOSPHATE": "0.13100",
+            "BOD": "7.00000",
+            "DISSOLVED_OXYGEN_MGL": "7.80000",
+            "FECAL_COLIFORMS": "240.00000",
+            "WATER_QUALITY_INDEX": "FAIR",
+            "USERID": "0"
+        }, {
+            "ID": "1341",
+            "STATION": "Station 17",
+            "DATE_CREATED": "2017-11-11",
+            "PH": "7.90000",
+            "AMMONIA_TOTAL_MGL_N": "0.02800",
+            "NITRATE_TOTAL_MGLASN": "0.26400",
+            "INORGANIC_PHOSPHATE": "0.10700",
+            "BOD": "1.00000",
+            "DISSOLVED_OXYGEN_MGL": "7.80000",
+            "FECAL_COLIFORMS": "240.00000",
+            "WATER_QUALITY_INDEX": "FAIR",
+            "USERID": "0"
+        }]
         var training_data = []
-
-        function getIndex(key, value) {
-            let index = map_normalization[key].indexOf(value)
-            if (index !== -1) {
-                return index
-            } else {
-                map_normalization[key].push(value)
-                return map_normalization[key].length - 1
-            }
-        }
 
         function train() {
             processSampleData()
@@ -954,24 +1088,30 @@
             console.log(JSON.stringify(net))
         }
 
+
         function test() {
 
-            /* var test_data = []
-            for (var i = 0; i < 5; i++) {
-                let randIndex = Math.floor(Math.random() * training_data.length);
-                let sampleTest = training_data[randIndex]
-                test_data.push(sampleTest)
-            } */
+            let randIndex = Math.floor(Math.random() * test_data.length);
+            let report = test_data[randIndex]
 
-            let randIndex = Math.floor(Math.random() * training_data.length);
-            let sampleTest = training_data[randIndex]
+            console.log('report %o', report)
 
-            /* console.log(sampleTest) */
-            /* let output = net.run(sampleTest) */
+            let raw_item = {
+                "PH": Number(report.PH),
+                "AMMONIA_TOTAL_MGL_N": Number(report.AMMONIA_TOTAL_MGL_N),
+                "NITRATE_TOTAL_MGLASN": Number(report.NITRATE_TOTAL_MGLASN),
+                "INORGANIC_PHOSPHATE": Number(report.INORGANIC_PHOSPHATE),
+                "BOD": Number(report.BOD),
+                "DISSOLVED_OXYGEN_MGL": Number(report.DISSOLVED_OXYGEN_MGL),
+                "FECAL_COLIFORMS": Number(report.FECAL_COLIFORMS),
+            }
+            let input = Object.keys(raw_item).map((key) => {
+                return raw_item[key]
+            })
 
-            let output = net.forecast([sampleTest], 1)
+            let output = net.forecast([input], 5)
 
-            let forcast_reports = output.map((forecast) => {
+            let forecast_reports = output.map((forecast) => {
                 return {
                     "PH": forecast['0'],
                     "AMMONIA_TOTAL_MGL_N": forecast['1'],
@@ -983,16 +1123,17 @@
                 }
             })
 
-            let output_grade = forcast_reports.map((report) => {
+            let wqi = new WQIClass(forecast_reports)
+
+            /* let output_grade = forcast_reports.map((report) => {
                 return {
                     report,
                     grade: getGrade(report)
                 }
-            })
+            }) */
 
-            /* console.log(output_grade) */
-            document.getElementById('input').innerHTML = JSON.stringify(sampleTest)
-            document.getElementById('output').innerHTML = JSON.stringify(output_grade)
+            document.getElementById('input').innerHTML = JSON.stringify(report)
+            document.getElementById('output').innerHTML = JSON.stringify(wqi)
         }
 
 
@@ -1038,188 +1179,16 @@
                 return input
             })
 
-
-            /* console.log("map normalize %o", map_normalization)
-            console.log("training data %o", sample_data) */
             sample_data = shuffle(sample_data)
             console.log("training data %o", sample_data)
 
             let train_set = Math.floor(sample_data.length / 1.5)
             training_data = sample_data.splice(0, train_set)
-            test_data = sample_data
+            //test_data = sample_data
         }
-
-        function getGrade(report) {
-            let wqi = computeWQI(report)
-            var eq = ""
-
-            if (wqi > 95) {
-                eq = "excellent"
-            } else if (wqi > 80) {
-                eq = "good"
-            } else if (wqi > 65) {
-                eq = "fair"
-            } else if (wqi > 45) {
-                eq = "marginal"
-            } else {
-                eq = "poor"
-            }
-            return {
-                wqi,
-                eq
-            }
-        }
-
-        function computeWQI(report) {
-            let f1 = computeFunction1(report)
-            let f2 = computeFunction2([report])
-            let f3 = computeFunction3(report)
-
-            let f1pow = Math.pow(f1, 2)
-            let f2pow = Math.pow(f2, 2)
-            let f3pow = Math.pow(f3, 2)
-
-            return 100 - (Math.sqrt(f1pow + f2pow + f3pow) / 1.732)
-        }
-
-
-        function computeFunction1(report) {
-            let n = Object.keys(report).length
-
-            let failed = Object.keys(report).map(key => {
-                let value = report[key]
-                return getBestWorst(key, value)
-            }).filter((item) => {
-                return !item.passed
-            })
-            console.log(failed)
-
-            return (failed.length / n) * 100
-        }
-
-        function computeFunction2(reports) {
-            let n = reports.length
-
-            let failed_reports = reports.map((report) => {
-                return Object.keys(report).map(key => {
-                    let value = report[key]
-                    return getBestWorst(key, value)
-                }).filter((item) => {
-                    return !item.passed
-                }).length
-            })
-
-            var sum_failed = 0
-            failed_reports.map((count) => {
-                sum_failed += count
-            })
-
-            let total_test_n = Object.keys(reports[0]).length * n
-
-            return (sum_failed / total_test_n) * 100
-        }
-
-        function computeFunction3(report) {
-            let n = Object.keys(report).length
-            let failed_test = Object.keys(report).map(key => {
-                let value = report[key]
-                return getBestWorst(key, value)
-            }).filter((item) => {
-                return !item.passed
-            })
-
-            let excursions = failed_test.map((test) => {
-                return computeExcursion(test)
-            })
-
-            var sum_excursions = 0
-            excursions.map((excursion) => {
-                sum_excursions += excursion
-            })
-            let normalized = sum_excursions / n
-            return (normalized / ((0.01 * normalized) + 0.01))
-        }
-
-        function computeExcursion(test) {
-            if (test.best < test.value) {
-                return (test.value / test.best) - 1
-            } else {
-                return (test.best / test.value) - 1
-            }
-        }
-
-
-
-        function computeParam(type, value) {
-            let param_value = getBestWorst(type)
-            let computed_value = 100 * ((value - param_value.best) / (param_value.worst - param_value.best))
-            return computed_value
-        }
-
-        function getBestWorst(type, value) {
-            switch (type) {
-                case 'PH':
-                    return {
-                        worst: 8,
-                            best: 7,
-                            passed: value < 8 && value >= 7,
-                            value,
-                            type
-                    }
-                    case 'AMMONIA_TOTAL_MGL_N':
-                        return {
-                            worst: 0.27,
-                                best: 0.05,
-                                passed: value < 0.21 && value >= 0.05,
-                                value,
-                                type
-                        }
-                        case 'NITRATE_TOTAL_MGLASN':
-                            return {
-                                worst: 10,
-                                    best: 0,
-                                    passed: value < 8 && value >= 0,
-                                    value,
-                                    type
-                            }
-                            case 'INORGANIC_PHOSPHATE':
-                                return {
-                                    worst: 0.75,
-                                        best: 0.06,
-                                        passed: value < 0.4 && value >= 0.06,
-                                        value,
-                                        type
-                                }
-                                case 'BOD':
-                                    return {
-                                        worst: 100,
-                                            best: 2,
-                                            passed: value < 6 && value >= 1,
-                                            value,
-                                            type
-                                    }
-                                    case 'DISSOLVED_OXYGEN_MGL':
-                                        return {
-                                            worst: 0,
-                                                best: 10,
-                                                passed: value > 4,
-                                                value,
-                                                type
-                                        }
-                                        case 'FECAL_COLIFORMS':
-                                            return {
-                                                worst: 200,
-                                                    best: 50,
-                                                    passed: value <= 100,
-                                                    value,
-                                                    type
-                                            }
-            }
-        }
-
-        train()
-        /* processSampleData()
-        loadANN() */
+        //train()
+        processSampleData()
+        loadANN()
     </script>
 </body>
 

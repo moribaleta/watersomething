@@ -1,6 +1,7 @@
 function getCoordinatesPerStation() {
     return {
         station1: {
+            id: 'Station 1',
             sName: '[Station 1] Central West Bay',
             oCoordinates: [
                 new google.maps.LatLng(14.425445, 121.129080), // starting point middle
@@ -23,6 +24,7 @@ function getCoordinatesPerStation() {
             ]
         },
         station2: {
+            id: 'Station 2',
             sName: '[Station 2] East Bay',
             oCoordinates: [
                 // Left
@@ -70,6 +72,7 @@ function getCoordinatesPerStation() {
             ]
         },
         station4: {
+            id: 'Station 4',
             sName: '[Station 4] Central Bay',
             oCoordinates: [
                 new google.maps.LatLng(14.423028, 121.227929), // starting upper middle of station F
@@ -87,6 +90,7 @@ function getCoordinatesPerStation() {
             ]
         },
         station5: {
+            id: 'Station 5',
             sName: '[Station 5] Northern West',
             oCoordinates: [
                 new google.maps.LatLng(14.524672, 121.105763), // starting point upper middle
@@ -107,6 +111,7 @@ function getCoordinatesPerStation() {
             ]
         },
         station8: {
+            id: 'Station 8',
             sName: '[Station 8] South Bay',
             oCoordinates: [
                 new google.maps.LatLng(14.243586, 121.172946),
@@ -147,6 +152,7 @@ function getCoordinatesPerStation() {
             ]
         },
         station15: {
+            id: 'Station 15',
             sName: '[Station 15] West Bay',
             oCoordinates: [
                 // Left Side
@@ -242,6 +248,7 @@ function getCoordinatesPerStation() {
             ]
         },
         station16: {
+            id: 'Station 16',
             sName: '[Station 16] West Bay',
             oCoordinates: [
                 // Up
@@ -304,6 +311,7 @@ function getCoordinatesPerStation() {
             ]
         },
         station17: {
+            id: 'Station 17',
             sName: '[Station 17] West Bay',
             oCoordinates: [
                 new google.maps.LatLng(14.282499, 121.271812), // starting point 
@@ -329,6 +337,7 @@ function getCoordinatesPerStation() {
             ]
         },
         station18: {
+            id: 'Station 18',
             sName: '[Station 18] East Bay',
             oCoordinates: [
                 // LEFT

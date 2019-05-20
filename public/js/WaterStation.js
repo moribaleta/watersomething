@@ -1,19 +1,19 @@
 class WaterStation {
-    /*  constructor(oGoogle, oMap, oStationInfo, fGrade = Math.random() * (100 - 1) + 1) {
-         this.oGoogle = oGoogle;
-         this.oMap = oMap;
-         this.oStationInfo = oStationInfo;
-         this.fGrade = fGrade;
+    
+    wqiObject = null
+    reports = []
 
-         this.createStation();
-     } */
-    constructor(oGoogle, oMap, oStationInfo, fGrade = 0, disableUI = false) {
+    constructor(oGoogle, oMap, oStationInfo, wqiObject, reports, disableUI = false) {
         this.oGoogle = oGoogle;
         this.oMap = oMap;
         this.oStationInfo = oStationInfo;
-        this.fGrade = fGrade;
+        this.wqiObject = wqiObject;
+        this.fGrade = wqiObject.wqi
+        this.reports = reports
         this.disableInteraction = disableUI
         this.createStation();
+
+        console.log("water reports %o", this.reports)
     }
 
     /**
@@ -95,7 +95,9 @@ class WaterStation {
      */
     createInfoWindow() {
         return new this.oGoogle.maps.InfoWindow({
-            content: `<div>${this.oStationInfo.sName} <br> Grade: ${this.fGrade}</div>`
+            content: `<div>${this.oStationInfo.sName} <br>
+                        WQI: ${ this.fGrade}<br>
+                        Grade: ${this.wqiObject.eq}</div>`
         });
     }
 
