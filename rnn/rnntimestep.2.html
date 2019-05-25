@@ -2063,7 +2063,9 @@
             console.log(JSON.stringify(net))
 
 
-            const output = net.run([[test_value]]);
+            const output = net.run([
+                [test_value]
+            ]);
 
             document.getElementById('input').innerHTML = JSON.stringify(test_value)
             document.getElementById('output').innerHTML = JSON.stringify(output)
@@ -2078,17 +2080,13 @@
             let randIndex = Math.floor(Math.random() * test_data.length);
             let report = test_data[randIndex]
 
-            console.log('report %o', report)
+            /* console.log('report %o', report) */
 
             let raw_item = {
-                /* "PH": Number(report.PH),
-                "AMMONIA_TOTAL_MGL_N": Number(report.AMMONIA_TOTAL_MGL_N),
-                "NITRATE_TOTAL_MGLASN": Number(report.NITRATE_TOTAL_MGLASN),
-                "INORGANIC_PHOSPHATE": Number(report.INORGANIC_PHOSPHATE),
-                "BOD": Number(report.BOD),
-                "DISSOLVED_OXYGEN_MGL": Number(report.DISSOLVED_OXYGEN_MGL), */
                 "FECAL_COLIFORMS": Number(report.FECAL_COLIFORMS),
             }
+
+            console.log(raw_item)
             /* let input = Object.keys(raw_item).map((key) => {
                 return raw_item[key]
             }) */
@@ -2097,12 +2095,6 @@
 
             let forecast_reports = output.map((forecast) => {
                 return {
-                    /* "PH": forecast['0'],
-                    "AMMONIA_TOTAL_MGL_N": forecast['1'],
-                    "NITRATE_TOTAL_MGLASN": forecast['2'],
-                    "INORGANIC_PHOSPHATE": forecast['3'],
-                    "BOD": forecast['4'],
-                    "DISSOLVED_OXYGEN_MGL": forecast['5'], */
                     "FECAL_COLIFORMS": forecast['0'],
                 }
             })
@@ -2116,7 +2108,7 @@
                 }
             }) */
 
-            document.getElementById('input').innerHTML = JSON.stringify(report)
+            document.getElementById('input').innerHTML = JSON.stringify(raw_item)
             document.getElementById('output').innerHTML = JSON.stringify(output)
         }
 
@@ -2147,28 +2139,41 @@
         }
 
         function processSampleData() {
-            sample_data = sample.filter(item => item.FECAL_COLIFORMS).map((item) => {
-                let raw_item = {
-                    /* "PH": Number(item.PH),
-                    "AMMONIA_TOTAL_MGL_N": Number(item.AMMONIA_TOTAL_MGL_N),
-                    "NITRATE_TOTAL_MGLASN": Number(item.NITRATE_TOTAL_MGLASN),
-                    "INORGANIC_PHOSPHATE": Number(item.INORGANIC_PHOSPHATE),
-                    "BOD": Number(item.BOD),
-                    "DISSOLVED_OXYGEN_MGL": Number(item.DISSOLVED_OXYGEN_MGL), */
-                    "FECAL_COLIFORMS": Number(item.FECAL_COLIFORMS),
+            var years = {}
+
+            sample.map((item) => {
+                let year = item.DATE_CREATED.split('-')[0]
+                if (!years[year]) {
+                    years[year] = [item]
+                } else {
+                    years[year].push(item)
                 }
-                let input = Object.keys(raw_item).map((key) => {
-                    return raw_item[key]
-                })
-                return input
             })
+
+            sample_data = Object.keys(years).map((year) => {
+                return years[year].filter(item => item.FECAL_COLIFORMS).map((item) => {
+                    let raw_item = {
+                        "FECAL_COLIFORMS": Number(item.FECAL_COLIFORMS),
+                    }
+                    return Number(item.FECAL_COLIFORMS)
+                    /* let input = Object.keys(raw_item).map((key) => {
+                        return raw_item[key]
+                    })
+                    return input */
+                    
+                })
+            })
+
 
             sample_data = shuffle(sample_data)
             console.log("training data %o", sample_data)
 
-            let train_set = Math.floor(sample_data.length / 1.5)
-            training_data = sample_data.splice(0, train_set)
-            //test_data = sample_data
+            training_data = sample_data.filter((data) => {
+                return data.length > 0
+            })
+
+            /* let train_set = Math.floor(sample_data.length / 1.5)
+            training_data = sample_data.splice(0, train_set) */
         }
         train()
         /* processSampleData()

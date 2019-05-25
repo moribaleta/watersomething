@@ -21,9 +21,8 @@ let home_app = new Vue({
         },
 
         setTableDisplay() {
-            console.log("here")
-            this.table = new TableClass(this.reports)
             this.setMapData()
+            tableGraph.setData(this.reports)
         },
 
         setMapData() {
@@ -74,7 +73,7 @@ let home_app = new Vue({
             Object.keys(stations).map(key => {
                 this.prediction = new PredictionClass()
                 let forecast_station = this.prediction.forecast(key, [stations[key][0]], 1)
-                console.log("%o %o \n %o", key, JSON.stringify(forecast_station), JSON.stringify(stations[key]))
+                /* console.log("%o %o \n %o", key, JSON.stringify(forecast_station), JSON.stringify(stations[key])) */
                 forecasted_reports = forecasted_reports.concat(forecast_station)
             })
             mapItems.map_simulate = new MapClass('map_simulation', forecasted_reports)

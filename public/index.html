@@ -12,6 +12,7 @@
     <script src="js/library/jquery-3.0.0.min.js"></script>
     <script src="js/library/vue.js"></script>
     <script src="js/library/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
     <script src="../admin/js/brain.js"></script>
     <title>Laravel</title>
 </head>
@@ -201,30 +202,30 @@
         <div id="water-quality-graph" class="jumbotron p-3" style="background: #f2f2f2">
             <div class="container">
                 <h1 class="display-5">Line Graph</h1>
-                
-                <div class="row">
+
+                <div class="row" id="table_graph">
                     <div class="col-md-5 col-12 form-group">
                         <label for="line-graph-range">Date Range: </label>
-                        <div id="line-graph-range" class="form-control date-picker">
-                            <i class="fa fa-calendar"></i>&nbsp;
-                            <span></span> <i class="fa fa-caret-down"></i>
-                        </div>
+                        <select id="line-graph-select" class="form-control search-parameters" v-model="select_date">
+                            <option v-for='item in selection_date' :value="item.id">{{item.label}}</option>
+                        </select>
                     </div>
                     <div class="col-md-4 col-12 form-group">
                         <label for="line-graph-select">Parameter: </label>
-                        <select id="line-graph-select" class="form-control search-parameters">
-                            <option selected>Nitrogen</option>
+                        <select id="line-graph-select" class="form-control search-parameters" v-model="select_type">
+                            <!-- <option selected>Nitrogen</option>
                             <option>Phosphate</option>
                             <option>pH</option>
                             <option>E. Coli</option>
                             <option>Dissolved Oxygen</option>
                             <option>Amonia</option>
                             <option>Temp F</option>
-                            <option>Transparency</option>
+                            <option>Transparency</option> -->
+                            <option v-for='item in selection_type' :value="item">{{item}}</option>
                         </select>
                     </div>
                     <div class="col-md-3 col-12 form-group text-center">
-                        <button type="button" class="btn btn-primary w-75" style="margin-top: 30px;">Search</button>
+                        <button type="button" class="btn btn-primary w-75" style="margin-top: 30px;" v-on:click="filterGraph()">Search</button>
                     </div>
                 </div>
 
@@ -275,8 +276,8 @@
     <script src="js/constants.js"></script>
     <script src="js/Legends.js"></script>
     <script src="js/WaterStation.js"></script>
-    <script src="js/maps.js"></script>
     <script src="js/table.js"></script>
+    <script src="js/maps.js"></script>
     <script src="js/home_app.js"></script>
     <script src="../admin/js/prediction.js"></script>
     <script src="../admin/js/wqi_calculator.js"></script>
