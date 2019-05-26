@@ -169,10 +169,10 @@ var tableGraph = new Vue({
                 let year = date[0]
                 let month = date[1]
                 let day = date[2]
-                if (this.select_date == 0) {
-                    return start_date.getFullYear() == year && start_date.getMonth() == month && start_date.getDate() == day
+                if (this.select_date == 0 || this.select_date == 1) {
+                    return start_date.getFullYear() == year && start_date.getMonth() + 1 == month && start_date.getDate() == day
                 }
-                return (start_date.getMonth() <= month && end_date.getMonth() >= month) && (start_date.getFullYear() <= year && end_date.getFullYear() >= year)
+                return (start_date.getMonth() + 1 <= month && end_date.getMonth() + 1 >= month) && (start_date.getFullYear() <= year && end_date.getFullYear() >= year)
             })
 
             console.log("filtered reports %o", reports)
